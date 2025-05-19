@@ -20,6 +20,7 @@ import {
   Delete as DeleteIcon,
   Search as SearchIcon,
 } from '@mui/icons-material';
+import Layout from '../components/Layout';
 
 interface Veiculo {
   id: number;
@@ -81,129 +82,144 @@ const Veiculos: React.FC = () => {
   );
 
   return (
-    <Box>
-      <Typography variant="h4" gutterBottom>
-        Controle de Veículos
-      </Typography>
-
-      <Paper sx={{ p: 3, mb: 3 }}>
-        <Typography variant="h6" gutterBottom>
-          Novo Veículo
+    <Layout>
+      <Box>
+        <Typography
+          variant="subtitle2"
+          sx={{ color: '#FF6C00', fontWeight: 700, mb: 0.5 }}
+        >
+          ÁREA ADMINISTRATIVA
         </Typography>
-        <form onSubmit={handleSubmit}>
-          <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { sm: '1fr 1fr' } }}>
-            <TextField
-              name="tipo"
-              label="Tipo"
-              select
-              value={formData.tipo}
-              onChange={handleInputChange}
-              required
-              fullWidth
-            >
-              {tiposVeiculo.map((tipo) => (
-                <MenuItem key={tipo} value={tipo}>
-                  {tipo}
-                </MenuItem>
-              ))}
-            </TextField>
-            <TextField
-              name="modelo"
-              label="Modelo"
-              value={formData.modelo}
-              onChange={handleInputChange}
-              required
-              fullWidth
-            />
-            <TextField
-              name="marca"
-              label="Marca"
-              value={formData.marca}
-              onChange={handleInputChange}
-              required
-              fullWidth
-            />
-            <TextField
-              name="ano"
-              label="Ano"
-              value={formData.ano}
-              onChange={handleInputChange}
-              required
-              fullWidth
-            />
-            <TextField
-              name="placa"
-              label="Placa"
-              value={formData.placa}
-              onChange={handleInputChange}
-              required
-              fullWidth
-            />
-          </Box>
-          <Box sx={{ mt: 2 }}>
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              sx={{ bgcolor: '#9C27B0' }}
-            >
-              Salvar
-            </Button>
-          </Box>
-        </form>
-      </Paper>
+        <Typography
+          variant="h5"
+          sx={{ fontWeight: 700, mb: 3 }}
+        >
+          Controle de Veículos
+        </Typography>
 
-      <Paper>
-        <Box sx={{ p: 2 }}>
-          <TextField
-            fullWidth
-            placeholder="Buscar por Modelo, Marca ou Placa"
-            value={busca}
-            onChange={(e) => setBusca(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
-        </Box>
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Modelo</TableCell>
-                <TableCell>Marca</TableCell>
-                <TableCell>Ano</TableCell>
-                <TableCell>Tipo</TableCell>
-                <TableCell>Placa</TableCell>
-                <TableCell align="right">Ações</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {veiculosFiltrados.map((veiculo) => (
-                <TableRow key={veiculo.id}>
-                  <TableCell>{veiculo.modelo}</TableCell>
-                  <TableCell>{veiculo.marca}</TableCell>
-                  <TableCell>{veiculo.ano}</TableCell>
-                  <TableCell>{veiculo.tipo}</TableCell>
-                  <TableCell>{veiculo.placa}</TableCell>
-                  <TableCell align="right">
-                    <IconButton color="primary" size="small">
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton color="error" size="small">
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
+        <Paper sx={{ p: 4, mb: 4 }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
+            Novo Veículo
+          </Typography>
+          <form onSubmit={handleSubmit}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 400 }}>
+              <TextField
+                name="tipo"
+                label="Tipo"
+                select
+                value={formData.tipo}
+                onChange={handleInputChange}
+                required
+                fullWidth
+                placeholder="Carro"
+              >
+                <MenuItem value="Carro">Carro</MenuItem>
+                <MenuItem value="Moto">Moto</MenuItem>
+              </TextField>
+              <TextField
+                name="modelo"
+                label="Modelo"
+                placeholder="HB20"
+                value={formData.modelo}
+                onChange={handleInputChange}
+                required
+                fullWidth
+              />
+              <TextField
+                name="marca"
+                label="Marca"
+                placeholder="Hyunday"
+                value={formData.marca}
+                onChange={handleInputChange}
+                required
+                fullWidth
+              />
+              <TextField
+                name="ano"
+                label="Ano"
+                placeholder="2016"
+                value={formData.ano}
+                onChange={handleInputChange}
+                required
+                fullWidth
+              />
+              <TextField
+                name="placa"
+                label="Placa"
+                placeholder="ABC-000"
+                value={formData.placa}
+                onChange={handleInputChange}
+                required
+                fullWidth
+              />
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{ bgcolor: '#9C27B0', color: '#fff', fontWeight: 700, mt: 2 }}
+                fullWidth
+              >
+                SALVAR
+              </Button>
+            </Box>
+          </form>
+        </Paper>
+
+        <Paper sx={{ p: 4 }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
+            Lista de Veículos
+          </Typography>
+          <Box sx={{ mb: 2, maxWidth: 300 }}>
+            <TextField
+              fullWidth
+              placeholder="Modelo, Marca, Placa"
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+              size="small"
+            />
+          </Box>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ fontWeight: 700 }}>Modelo</TableCell>
+                  <TableCell sx={{ fontWeight: 700 }}>Marca</TableCell>
+                  <TableCell sx={{ fontWeight: 700 }}>Ano</TableCell>
+                  <TableCell sx={{ fontWeight: 700 }}>Tipo</TableCell>
+                  <TableCell sx={{ fontWeight: 700 }}>Placa</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: 700 }}>Ações</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Paper>
-    </Box>
+              </TableHead>
+              <TableBody>
+                {veiculosFiltrados.map((veiculo) => (
+                  <TableRow key={veiculo.id}>
+                    <TableCell>{veiculo.modelo}</TableCell>
+                    <TableCell>{veiculo.marca}</TableCell>
+                    <TableCell>{veiculo.ano}</TableCell>
+                    <TableCell>{veiculo.tipo}</TableCell>
+                    <TableCell>{veiculo.placa}</TableCell>
+                    <TableCell align="right">
+                      <IconButton color="primary" size="small" sx={{ mr: 1 }}>
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton color="error" size="small">
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Paper>
+      </Box>
+    </Layout>
   );
 };
 

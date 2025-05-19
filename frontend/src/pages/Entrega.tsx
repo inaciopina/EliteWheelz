@@ -10,6 +10,7 @@ import {
   FormControlLabel,
   Checkbox,
 } from '@mui/material';
+import Layout from '../components/Layout';
 
 interface EntregaData {
   cliente: string;
@@ -48,30 +49,59 @@ const Entrega: React.FC = () => {
   };
 
   return (
-    <Box>
-      <Typography variant="h4" gutterBottom>
-        Entrega de Veículo
-      </Typography>
+    <Layout>
+      <Box>
+        <Typography
+          variant="subtitle2"
+          sx={{ color: '#FF6C00', fontWeight: 700, mb: 0.5 }}
+        >
+          ÁREA ADMINISTRATIVA
+        </Typography>
+        <Typography
+          variant="h5"
+          sx={{ fontWeight: 700, mb: 3 }}
+        >
+          Entrega de Veículo
+        </Typography>
 
-      <Paper sx={{ p: 3 }}>
-        <form onSubmit={handleSubmit}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="subtitle1" gutterBottom>
-                Cliente
-              </Typography>
+        <Paper sx={{ p: 4, mb: 4 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
+            <Box sx={{ minWidth: 250 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>Cliente:</Typography>
               <Typography variant="body1">{formData.cliente}</Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="subtitle1" gutterBottom>
-                Veículo
-              </Typography>
+            </Box>
+            <Box sx={{ minWidth: 250 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>Veículo:</Typography>
               <Typography variant="body1">{formData.veiculo}</Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
+            </Box>
+            <Box sx={{ minWidth: 200 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>Data de Entrega:</Typography>
+              <Typography variant="body1">{formData.dataEntrega || '--/--/----'}</Typography>
+            </Box>
+            <Box sx={{ minWidth: 200 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>KM Entrega:</Typography>
+              <Typography variant="body1">{formData.kmEntrega || '----'}</Typography>
+            </Box>
+            <Box sx={{ minWidth: 120 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>Seguro:</Typography>
+              <Typography variant="body1">{formData.seguro ? 'Sim' : 'Não'}</Typography>
+            </Box>
+          </Box>
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>Observações</Typography>
+            <Typography variant="body2">{formData.observacoes || '---'}</Typography>
+          </Box>
+        </Paper>
+
+        <Paper sx={{ p: 4 }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
+            Finalizar Locação
+          </Typography>
+          <form onSubmit={handleSubmit}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 500 }}>
               <TextField
                 name="dataEntrega"
-                label="Data da Entrega"
+                label="Data de Entrega"
                 type="date"
                 value={formData.dataEntrega}
                 onChange={handleInputChange}
@@ -79,70 +109,52 @@ const Entrega: React.FC = () => {
                 fullWidth
                 InputLabelProps={{ shrink: true }}
               />
-            </Grid>
-            <Grid item xs={12} sm={6}>
               <TextField
                 name="kmEntrega"
                 label="KM Entrega"
+                placeholder="78540"
                 value={formData.kmEntrega}
                 onChange={handleInputChange}
                 required
                 fullWidth
               />
-            </Grid>
-            <Grid item xs={12}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    name="seguro"
-                    checked={formData.seguro}
-                    onChange={handleInputChange}
-                  />
-                }
-                label="Seguro"
-              />
-            </Grid>
-            <Grid item xs={12}>
               <TextField
                 name="observacoes"
                 label="Observações"
+                placeholder="Digite observações..."
                 value={formData.observacoes}
                 onChange={handleInputChange}
                 multiline
                 rows={4}
                 fullWidth
               />
-            </Grid>
-            <Grid item xs={12}>
               <Box
                 sx={{
-                  bgcolor: 'primary.main',
-                  color: 'white',
+                  bgcolor: '#EDE7F6',
+                  color: '#222',
                   p: 2,
                   borderRadius: 1,
                   textAlign: 'center',
+                  fontWeight: 700,
+                  fontSize: 24,
+                  mb: 2,
                 }}
               >
-                <Typography variant="h5">
-                  TOTAL R$ {formData.total.toFixed(2)}
-                </Typography>
+                TOTAL R$ {formData.total.toFixed(2)}
               </Box>
-            </Grid>
-            <Grid item xs={12}>
               <Button
                 type="submit"
                 variant="contained"
-                color="primary"
+                sx={{ bgcolor: '#9C27B0', color: '#fff', fontWeight: 700 }}
                 fullWidth
-                sx={{ bgcolor: '#9C27B0' }}
               >
-                Salvar Locação
+                SALVAR LOCAÇÃO
               </Button>
-            </Grid>
-          </Grid>
-        </form>
-      </Paper>
-    </Box>
+            </Box>
+          </form>
+        </Paper>
+      </Box>
+    </Layout>
   );
 };
 

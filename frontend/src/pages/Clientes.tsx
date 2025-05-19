@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Paper,
@@ -21,26 +21,39 @@ import {
   Search as SearchIcon,
 } from '@mui/icons-material';
 import Layout from '../components/Layout';
+import {
+  getClientes,
+  createCliente,
+  deleteCliente
+} from '../api';
 
 interface Cliente {
-  id: number;
-  nome: string;
-  email: string;
-  telefone: string;
-  cpf: string;
-  cnh: string;
+  id_cliente: number;
+  nm_cliente: string;
+  ds_email: string;
+  ds_telefone: string;
+  ds_cpf: string;
+  ds_cnh: string;
 }
 
 const Clientes: React.FC = () => {
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [formData, setFormData] = useState({
-    nome: '',
-    email: '',
-    telefone: '',
-    cpf: '',
-    cnh: '',
+    nm_cliente: '',
+    ds_email: '',
+    ds_telefone: '',
+    ds_cpf: '',
+    ds_cnh: '',
   });
   const [busca, setBusca] = useState('');
+
+  useEffect(() => {
+    async function fetchClientes() {
+      const data = await getClientes();
+      setClientes(data);
+    }
+    fetchClientes();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -50,24 +63,28 @@ const Clientes: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newCliente: Cliente = {
-      id: Date.now(),
-      ...formData,
-    };
-    setClientes((prev) => [...prev, newCliente]);
+    await createCliente(formData);
+    const data = await getClientes();
+    setClientes(data);
     setFormData({
-      nome: '',
-      email: '',
-      telefone: '',
-      cpf: '',
-      cnh: '',
+      nm_cliente: '',
+      ds_email: '',
+      ds_telefone: '',
+      ds_cpf: '',
+      ds_cnh: '',
     });
   };
 
+  const handleDelete = async (id: number) => {
+    await deleteCliente(id);
+    const data = await getClientes();
+    setClientes(data);
+  };
+
   const clientesFiltrados = clientes.filter((cliente) =>
-    cliente.nome.toLowerCase().includes(busca.toLowerCase())
+    cliente.nm_cliente.toLowerCase().includes(busca.toLowerCase())
   );
 
   return (
@@ -93,47 +110,47 @@ const Clientes: React.FC = () => {
           <form onSubmit={handleSubmit}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 400 }}>
               <TextField
-                name="nome"
+                name="nm_cliente"
                 label="Nome"
                 placeholder="Bruno"
-                value={formData.nome}
+                value={formData.nm_cliente}
                 onChange={handleInputChange}
                 required
                 fullWidth
               />
               <TextField
-                name="email"
+                name="ds_email"
                 label="Email"
                 placeholder="bruno@gmail.com"
                 type="email"
-                value={formData.email}
+                value={formData.ds_email}
                 onChange={handleInputChange}
                 required
                 fullWidth
               />
               <TextField
-                name="telefone"
+                name="ds_telefone"
                 label="Telefone"
                 placeholder="(11) 999938-5764"
-                value={formData.telefone}
+                value={formData.ds_telefone}
                 onChange={handleInputChange}
                 required
                 fullWidth
               />
               <TextField
-                name="cpf"
+                name="ds_cpf"
                 label="CPF"
                 placeholder="323.323.232-33"
-                value={formData.cpf}
+                value={formData.ds_cpf}
                 onChange={handleInputChange}
                 required
                 fullWidth
               />
               <TextField
-                name="cnh"
+                name="ds_cnh"
                 label="CNH"
                 placeholder="06856723456897"
-                value={formData.cnh}
+                value={formData.ds_cnh}
                 onChange={handleInputChange}
                 required
                 fullWidth
@@ -183,16 +200,16 @@ const Clientes: React.FC = () => {
               </TableHead>
               <TableBody>
                 {clientesFiltrados.map((cliente) => (
-                  <TableRow key={cliente.id}>
-                    <TableCell>{cliente.nome}</TableCell>
-                    <TableCell>{cliente.cpf}</TableCell>
-                    <TableCell>{cliente.telefone}</TableCell>
-                    <TableCell>{cliente.email}</TableCell>
+                  <TableRow key={cliente.id_cliente}>
+                    <TableCell>{cliente.nm_cliente}</TableCell>
+                    <TableCell>{cliente.ds_cpf}</TableCell>
+                    <TableCell>{cliente.ds_telefone}</TableCell>
+                    <TableCell>{cliente.ds_email}</TableCell>
                     <TableCell align="right">
                       <IconButton color="primary" size="small" sx={{ mr: 1 }}>
                         <EditIcon />
                       </IconButton>
-                      <IconButton color="error" size="small">
+                      <IconButton color="error" size="small" onClick={() => handleDelete(cliente.id_cliente)}>
                         <DeleteIcon />
                       </IconButton>
                     </TableCell>

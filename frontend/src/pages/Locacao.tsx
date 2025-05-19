@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Paper,
@@ -23,64 +23,97 @@ import {
   Search as SearchIcon,
 } from '@mui/icons-material';
 import Layout from '../components/Layout';
+import {
+  getLocacoes,
+  createLocacao,
+  deleteLocacao
+} from '../api';
 
 interface Locacao {
-  id: number;
-  nome: string;
-  cliente: string;
-  modelo: string;
-  veiculo: string;
-  dataLocacao: string;
-  kmRetirada: string;
-  seguro: boolean;
-  observacoes: string;
+  id_locacao: number;
+  id_cliente: number;
+  id_veiculo: number;
+  nr_km_retirada: string;
+  dt_locacao: string;
+  bt_seguro: boolean;
+  ds_observacoes: string;
+  ds_situacao: string;
+  nr_km_entrega: string;
+  dt_entrega: string;
+  vl_total: number;
 }
+
+// Exemplo de clientes e veículos para select (substitua por dados reais da API)
+const clientes = [
+  { id_cliente: 1, nm_cliente: 'Bruno', ds_cpf: '123.345.589-10' },
+  { id_cliente: 2, nm_cliente: 'Helen', ds_cpf: '432.543.642-34' },
+];
+const veiculos = [
+  { id_veiculo: 1, ds_modelo: 'HB20', nr_ano: 2016, ds_placa: 'ABC-123' },
+  { id_veiculo: 2, ds_modelo: 'FIT', nr_ano: 2017, ds_placa: 'ABC-432' },
+];
 
 const Locacao: React.FC = () => {
   const [locacoes, setLocacoes] = useState<Locacao[]>([]);
   const [busca, setBusca] = useState('');
   const [formData, setFormData] = useState({
-    nome: '',
-    cliente: '',
-    modelo: '',
-    veiculo: '',
-    dataLocacao: '',
-    kmRetirada: '',
-    seguro: false,
-    observacoes: '',
+    id_cliente: 1,
+    id_veiculo: 1,
+    nr_km_retirada: '',
+    dt_locacao: '',
+    bt_seguro: false,
+    ds_observacoes: '',
+    ds_situacao: 'Em andamento',
+    nr_km_entrega: '',
+    dt_entrega: '',
+    vl_total: 0,
   });
+
+  useEffect(() => {
+    async function fetchLocacoes() {
+      const data = await getLocacoes();
+      setLocacoes(data);
+    }
+    fetchLocacoes();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === 'checkbox' ? checked : (name === 'id_cliente' || name === 'id_veiculo' ? Number(value) : value),
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newLocacao: Locacao = {
-      id: Date.now(),
-      ...formData,
-    };
-    setLocacoes((prev) => [...prev, newLocacao]);
+    await createLocacao(formData);
+    const data = await getLocacoes();
+    setLocacoes(data);
     setFormData({
-      nome: '',
-      cliente: '',
-      modelo: '',
-      veiculo: '',
-      dataLocacao: '',
-      kmRetirada: '',
-      seguro: false,
-      observacoes: '',
+      id_cliente: 1,
+      id_veiculo: 1,
+      nr_km_retirada: '',
+      dt_locacao: '',
+      bt_seguro: false,
+      ds_observacoes: '',
+      ds_situacao: 'Em andamento',
+      nr_km_entrega: '',
+      dt_entrega: '',
+      vl_total: 0,
     });
+  };
+
+  const handleDelete = async (id: number) => {
+    await deleteLocacao(id);
+    const data = await getLocacoes();
+    setLocacoes(data);
   };
 
   const locacoesFiltradas = locacoes.filter(
     (locacao) =>
-      locacao.nome.toLowerCase().includes(busca.toLowerCase()) ||
-      locacao.cliente.toLowerCase().includes(busca.toLowerCase())
+      clientes.find(c => c.id_cliente === locacao.id_cliente)?.nm_cliente.toLowerCase().includes(busca.toLowerCase()) ||
+      clientes.find(c => c.id_cliente === locacao.id_cliente)?.ds_cpf.includes(busca)
   );
 
   return (
@@ -106,73 +139,55 @@ const Locacao: React.FC = () => {
           <form onSubmit={handleSubmit}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 500 }}>
               <TextField
-                name="nome"
-                label="Nome"
-                placeholder="Bruno"
-                value={formData.nome}
-                onChange={handleInputChange}
-                required
-                fullWidth
-              />
-              <TextField
-                name="cliente"
+                name="id_cliente"
                 label="Cliente"
                 select
-                value={formData.cliente}
+                value={formData.id_cliente}
                 onChange={handleInputChange}
                 required
                 fullWidth
-                placeholder="Bruno, 123.345.589-10"
               >
-                <MenuItem value="Bruno, 123.345.589-10">Bruno, 123.345.589-10</MenuItem>
-                <MenuItem value="Helen, 432.543.642-34">Helen, 432.543.642-34</MenuItem>
+                {clientes.map((c) => (
+                  <MenuItem key={c.id_cliente} value={c.id_cliente}>{c.nm_cliente}, {c.ds_cpf}</MenuItem>
+                ))}
               </TextField>
               <TextField
-                name="modelo"
-                label="Modelo"
-                placeholder="HB20"
-                value={formData.modelo}
-                onChange={handleInputChange}
-                required
-                fullWidth
-              />
-              <TextField
-                name="veiculo"
+                name="id_veiculo"
                 label="Veículo"
                 select
-                value={formData.veiculo}
+                value={formData.id_veiculo}
                 onChange={handleInputChange}
                 required
                 fullWidth
-                placeholder="HB20, 2016, ABC-123"
               >
-                <MenuItem value="HB20, 2016, ABC-123">HB20, 2016, ABC-123</MenuItem>
-                <MenuItem value="FIT, 2017, ABC-432">FIT, 2017, ABC-432</MenuItem>
+                {veiculos.map((v) => (
+                  <MenuItem key={v.id_veiculo} value={v.id_veiculo}>{v.ds_modelo}, {v.nr_ano}, {v.ds_placa}</MenuItem>
+                ))}
               </TextField>
               <TextField
-                name="dataLocacao"
+                name="dt_locacao"
                 label="Data da Locação"
                 type="date"
-                value={formData.dataLocacao}
+                value={formData.dt_locacao}
                 onChange={handleInputChange}
                 required
                 fullWidth
                 InputLabelProps={{ shrink: true }}
               />
               <TextField
-                name="kmRetirada"
+                name="nr_km_retirada"
                 label="KM Retirada"
                 placeholder="78540"
-                value={formData.kmRetirada}
+                value={formData.nr_km_retirada}
                 onChange={handleInputChange}
                 required
                 fullWidth
               />
               <TextField
-                name="observacoes"
+                name="ds_observacoes"
                 label="Observações"
                 placeholder="Digite observações..."
-                value={formData.observacoes}
+                value={formData.ds_observacoes}
                 onChange={handleInputChange}
                 multiline
                 rows={4}
@@ -181,8 +196,8 @@ const Locacao: React.FC = () => {
               <FormControlLabel
                 control={
                   <Checkbox
-                    name="seguro"
-                    checked={formData.seguro}
+                    name="bt_seguro"
+                    checked={formData.bt_seguro}
                     onChange={handleInputChange}
                   />
                 }
@@ -233,11 +248,11 @@ const Locacao: React.FC = () => {
               </TableHead>
               <TableBody>
                 {locacoesFiltradas.map((locacao) => (
-                  <TableRow key={locacao.id}>
-                    <TableCell>{locacao.cliente}</TableCell>
-                    <TableCell>{locacao.nome}</TableCell>
-                    <TableCell>{locacao.veiculo}</TableCell>
-                    <TableCell>{locacao.dataLocacao}</TableCell>
+                  <TableRow key={locacao.id_locacao}>
+                    <TableCell>{clientes.find(c => c.id_cliente === locacao.id_cliente)?.nm_cliente}</TableCell>
+                    <TableCell>{clientes.find(c => c.id_cliente === locacao.id_cliente)?.ds_cpf}</TableCell>
+                    <TableCell>{veiculos.find(v => v.id_veiculo === locacao.id_veiculo)?.ds_modelo} ({veiculos.find(v => v.id_veiculo === locacao.id_veiculo)?.ds_placa})</TableCell>
+                    <TableCell>{locacao.dt_locacao}</TableCell>
                     <TableCell align="right">
                       <Button
                         variant="contained"
@@ -249,7 +264,7 @@ const Locacao: React.FC = () => {
                       <IconButton color="primary" size="small" sx={{ mr: 1 }}>
                         <EditIcon />
                       </IconButton>
-                      <IconButton color="error" size="small">
+                      <IconButton color="error" size="small" onClick={() => handleDelete(locacao.id_locacao)}>
                         <DeleteIcon />
                       </IconButton>
                     </TableCell>
